@@ -1,0 +1,140 @@
+.cartContainer {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+.cartGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .cartGrid {
+        grid-template-columns: 1fr 350px;
+        align-items: start;
+    }
+}
+
+.cartList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cartItem {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 1.5rem;
+    position: relative;
+}
+
+.itemImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background: #f1f5f9;
+}
+
+.itemContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.itemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.itemTitle {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+}
+
+.itemOptions {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.optionTag {
+    background: #f8fafc;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.itemFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantityControl input {
+    width: 60px;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.itemPrice {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
+.removeBtn {
+    color: var(--danger-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+/* Summary Card (Reusable-ish) */
+.summaryCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    position: sticky;
+    top: 100px;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    color: var(--text-muted);
+}
+
+.totalRow {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-main);
+}

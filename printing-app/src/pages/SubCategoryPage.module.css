@@ -1,0 +1,21 @@
+.subCatGrid {
+    display: grid;
+    gap: 1.5rem;
+    /* Standard gap */
+    grid-template-columns: repeat(2, 1fr);
+    padding-bottom: 2rem;
+}
+
+/* Tablet: 3 cols */
+@media (min-width: 640px) {
+    .subCatGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Desktop: 4 cols as requested */
+@media (min-width: 1024px) {
+    .subCatGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

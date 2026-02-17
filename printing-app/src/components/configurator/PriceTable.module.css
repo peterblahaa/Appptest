@@ -1,0 +1,69 @@
+.tableContainer {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+.customInput {
+    margin-bottom: 1.5rem;
+}
+
+.customInput label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.customInput input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+}
+
+.priceTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.priceTable th {
+    padding: 1rem;
+    background: #f8fafc;
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.priceTable td {
+    padding: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.priceTable tr:hover td {
+    background: #f1f5f9;
+}
+
+.activeRow td {
+    background: #eff6ff;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.activeHead {
+    color: var(--primary-color) !important;
+    background: #eff6ff !important;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.selectedCell {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-radius: var(--radius-sm);
+}

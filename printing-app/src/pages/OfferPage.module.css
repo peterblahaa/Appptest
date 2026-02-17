@@ -1,0 +1,26 @@
+.offerGrid {
+    display: grid;
+    gap: 1rem;
+    /* Reduced gap from 1.5rem to 1rem for tighter grouping */
+    grid-template-columns: repeat(2, 1fr);
+    padding-bottom: 2rem;
+}
+
+/* Tablet: 3 cols */
+@media (min-width: 640px) {
+    .offerGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Desktop: 6 cols as requested */
+@media (min-width: 1024px) {
+    .offerGrid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.title {
+    margin: 2rem 0;
+    font-size: 2rem;
+}

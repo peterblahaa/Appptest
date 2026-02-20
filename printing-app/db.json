@@ -743,9 +743,10 @@
         }
       ],
       "total": 23.06,
-      "status": "new",
+      "status": "processing",
       "userId": "12c7",
-      "date": "2026-02-18T16:28:55.519Z"
+      "date": "2026-02-18T16:28:55.519Z",
+      "assignedTo": "emp-001"
     }
   ],
   "messages": [

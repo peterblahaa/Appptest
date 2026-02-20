@@ -13,7 +13,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { HomePage } from './pages/HomePage';
 import { AccountPage } from './pages/AccountPage';
 import { AdminPage } from './pages/AdminPage';
-import { TestQRPage } from './pages/TestQRPage';
+
 
 import { Footer } from './components/common/Footer';
 
@@ -35,7 +35,7 @@ function App() {
                 <Route path="/produkt/:id" element={<ProductPage />} />
                 <Route path="/kosik" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/test" element={<TestQRPage />} />
+
               </Routes>
             </main>
             <Footer />

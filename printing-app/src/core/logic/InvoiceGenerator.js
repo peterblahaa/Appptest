@@ -266,9 +266,9 @@ export const generateInvoice = async (order) => {
         // --- Pay by Square QR Code Implementation (Fixed & Restored) ---
         // Uses standard bysquare.encode() (String output) + Patched LZMA (EOS marker)
         // This matches the working Python implementation.
-        const qrSize = 35;
-        const qrX = 160;
-        const qrY = footerStartY - 10;
+        const qrSize = 40;
+        const qrX = 20;
+        const qrY = footerStartY - 15;
 
         try {
             // --- PAY BY SQUARE (HARDCODED DEBUG MODE) ---
@@ -318,16 +318,19 @@ export const generateInvoice = async (order) => {
                 ],
             };
 
-            // Encode with Verified Options
+            // 2. Encode to String
+            // We use version: 0 and documentType: 8 to ensure compatibility with banking apps
+            // This mimics the behavior of the Python 'pay_by_square' library which generates shorter payloads for V0.
             let payBySquareString;
             try {
                 payBySquareString = bysquare.encode(payload, { version: 0, documentType: 8 });
             } catch (error) {
-                console.warn("Encode with options failed, trying default:", error);
+                console.warn("QR Version 0 encoding failed, falling back to default:", error);
                 payBySquareString = bysquare.encode(payload);
             }
 
-            console.log("InvoiceGenerator HARDCODED QR String:", payBySquareString);
+            // 3. Generate QR Image
+
 
             // Generate QR Image
             const toDataURL = QRCode.toDataURL || QRCode.default?.toDataURL;

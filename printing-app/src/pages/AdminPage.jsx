@@ -538,13 +538,7 @@ export const AdminPage = () => {
             <div className={styles.header}>
                 <h1>Admin Dashboard</h1>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button
-                        onClick={() => navigate('/test')}
-                        className="btn btn-outline"
-                        style={{ borderColor: '#6366f1', color: '#6366f1' }}
-                    >
-                        Otvoriť Test QR
-                    </button>
+
                 </div>
             </div>
 

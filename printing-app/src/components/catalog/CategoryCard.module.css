@@ -25,7 +25,6 @@
 .card:hover {
     border-color: var(--primary-light);
     box-shadow: var(--shadow-lg);
-    transform: translateY(-8px);
 }
 
 .imageContainer {
@@ -74,9 +73,7 @@
     /* Optional: hide base image if hover image is transparent, otherwise keep 1 */
 }
 
-.card:hover .imageContainer img {
-    transform: scale(1.05);
-}
+
 
 /* Gradient Overlay REMOVED */
 

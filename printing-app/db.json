@@ -710,6 +710,42 @@
       "userId": "89bc",
       "date": "2026-02-15T20:34:25.095Z",
       "assignedTo": "emp-002"
+    },
+    {
+      "id": "ef28",
+      "customer": {
+        "name": "Peter Blasko",
+        "email": "peterblahaa@gmail.com",
+        "phone": "+4552638297",
+        "street": "Štepánkovická 750",
+        "city": "Štrba",
+        "zip": "05938",
+        "payment": "card"
+      },
+      "items": [
+        {
+          "id": "postove-krabice-sub",
+          "name": "Poštové krabice",
+          "qty": 75,
+          "selectedOptions": {
+            "internalDimensions": "100x100x100",
+            "papers": "Karton 300g",
+            "print": "Jednostranný 4/0",
+            "surfaceFinish": "none",
+            "uvLack": "none",
+            "colorFoil": "none",
+            "fileCheck": "auto"
+          },
+          "shipping": "standard",
+          "totalPriceVat": 23.06,
+          "deliveryDate": "22. 02. 2026",
+          "cartId": 1771432122006.0334
+        }
+      ],
+      "total": 23.06,
+      "status": "new",
+      "userId": "12c7",
+      "date": "2026-02-18T16:28:55.519Z"
     }
   ],
   "messages": [

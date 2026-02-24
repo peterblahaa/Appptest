@@ -14,6 +14,7 @@ import { HomePage } from './pages/HomePage';
 import { AccountPage } from './pages/AccountPage';
 import { AdminPage } from './pages/AdminPage';
 
+import { TestKalkulackaPage } from './pages/TestKalkulackaPage';
 
 import { Footer } from './components/common/Footer';
 
@@ -35,7 +36,7 @@ function App() {
                 <Route path="/produkt/:id" element={<ProductPage />} />
                 <Route path="/kosik" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
-
+                <Route path="/testkalkulacka" element={<TestKalkulackaPage />} />
               </Routes>
             </main>
             <Footer />

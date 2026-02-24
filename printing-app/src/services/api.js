@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000';
+// TODO: Pred nasadením zmeňte túto URL na vašu skutočnú doménu, napr. 'https://vasadomena.sk/api'
+const API_URL = import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:3000';
 
 export const api = {
     // --- PRODUCTS ---
@@ -195,11 +196,37 @@ export const api = {
         return await response.json();
     },
 
-    async deleteEmployee(id) {
-        const response = await fetch(`${API_URL}/employees/${id}`, {
+    // --- MACHINES ---
+    async getMachines() {
+        const response = await fetch(`${API_URL}/machines`);
+        return await response.json();
+    },
+
+    async createMachine(data) {
+        const response = await fetch(`${API_URL}/machines`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Vytvorenie stroja zlyhalo.');
+        return await response.json();
+    },
+
+    async updateMachine(id, data) {
+        const response = await fetch(`${API_URL}/machines/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Aktualizácia stroja zlyhala.');
+        return await response.json();
+    },
+
+    async deleteMachine(id) {
+        const response = await fetch(`${API_URL}/machines/${id}`, {
             method: 'DELETE'
         });
-        if (!response.ok) throw new Error('Odstránenie zamestnanca zlyhalo.');
+        if (!response.ok) throw new Error('Odstránenie stroja zlyhalo.');
         return true;
     }
 };

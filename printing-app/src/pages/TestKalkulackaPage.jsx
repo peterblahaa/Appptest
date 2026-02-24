@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { calculate_print_price, FORMATS, DEFAULT_MACHINES, OFFSET_COLOR_MODES, BINDINGS, DEFAULT_FINISHING } from '../core/calculator';
+import { api } from '../services/api';
 
 export function TestKalkulackaPage() {
     // === CONFIG STATE ===
@@ -17,6 +18,29 @@ export function TestKalkulackaPage() {
         offset_setup_per_side: 30,
         plate_price: 6,
     });
+    const [apiMachines, setApiMachines] = useState({});
+
+    React.useEffect(() => {
+        const fetchMachines = async () => {
+            try {
+                const machinesList = await api.getMachines();
+                const machinesObj = {};
+                for (const m of machinesList) {
+                    machinesObj[m.id] = { ...m };
+                    delete machinesObj[m.id].id;
+                }
+                setApiMachines(machinesObj);
+
+                // Set default selected if applicable
+                if (machinesList.length > 0) {
+                    setCalcParams(prev => ({ ...prev, machine_name: machinesList[0].id }));
+                }
+            } catch (err) {
+                console.error("Nebolo možné načítať stroje z databázy:", err);
+            }
+        };
+        fetchMachines();
+    }, []);
 
     // === CALCULATOR STATE ===
     const [calcParams, setCalcParams] = useState({
@@ -39,7 +63,7 @@ export function TestKalkulackaPage() {
     const [error, setError] = useState(null);
 
     // Derived combo lists
-    const allMachines = { ...DEFAULT_MACHINES, ...customMachines };
+    const allMachines = { ...DEFAULT_MACHINES, ...apiMachines, ...customMachines };
     const machineOptions = Object.keys(allMachines);
     const formatOptions = Object.keys(FORMATS);
     const offsetColorOptions = Object.keys(OFFSET_COLOR_MODES);
@@ -47,12 +71,13 @@ export function TestKalkulackaPage() {
     const finishingOptions = Object.keys(DEFAULT_FINISHING);
 
     // === HANDLERS ===
-    const handleAddMachine = (e) => {
+    const handleAddMachine = async (e) => {
         e.preventDefault();
         if (!newMachine.name) return;
 
         // Parse numeric fields properly
         const parsedMachine = {
+            id: newMachine.name,
             sheet_format: newMachine.sheet_format,
             technology: newMachine.technology,
         };
@@ -67,13 +92,31 @@ export function TestKalkulackaPage() {
             parsedMachine.plate_price = Number(newMachine.plate_price);
         }
 
-        setCustomMachines({
-            ...customMachines,
-            [newMachine.name]: parsedMachine
-        });
+        try {
+            await api.createMachine(parsedMachine);
 
-        // reset basic fields on add machine
-        setNewMachine({ ...newMachine, name: '' });
+            // Update local state to reflect the newly created machine immediately
+            const machineForState = { ...parsedMachine };
+            delete machineForState.id;
+
+            setApiMachines(prev => ({
+                ...prev,
+                [newMachine.name]: machineForState
+            }));
+
+            // reset basic fields on add machine
+            setNewMachine({ ...newMachine, name: '' });
+            alert('Stroj bol úspešne uložený do databázy!');
+        } catch (err) {
+            console.error("Chyba pri vytváraní stroja:", err);
+            alert('Nepodarilo sa uložiť stroj do databázy. Skontrolujte pripojenie.');
+
+            // Fallback - aspoň dočasne uložíme lokálne, ak zlyhá API (na testovacie účely)
+            setCustomMachines({
+                ...customMachines,
+                [newMachine.name]: parsedMachine
+            });
+        }
     };
 
     const handleCalculate = () => {

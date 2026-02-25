@@ -130,7 +130,7 @@ export function TestKalkulackaPage() {
                 pages: Number(calcParams.pages),
                 paper_price_per_ton: Number(paperPricePerTon),
                 paper_margin_percent: Number(paperMarginPercent),
-                custom_machines: customMachines,
+                custom_machines: { ...customMachines, ...apiMachines },
                 duplex: calcParams.duplex === true || calcParams.duplex === 'true',
             });
             setResult(res);

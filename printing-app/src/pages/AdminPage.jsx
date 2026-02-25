@@ -991,7 +991,7 @@ export const AdminPage = () => {
                                         <td style={{ fontWeight: 600 }}>{product.name}</td>
                                         <td style={{ fontSize: '0.9rem', color: '#64748b' }}>{prodCat ? prodCat.name : product.categoryId}</td>
                                         <td style={{ maxWidth: '300px', fontSize: '0.9rem', color: '#64748b' }}>{product.description}</td>
-                                        <td>{product.basePrice.toFixed(2)} €</td>
+                                        <td>{Number(product.basePrice || 0).toFixed(2)} €</td>
                                         <td>
                                             <span className={product.isVisible ? styles.statusCompleted : styles.statusCancelled}>
                                                 {product.isVisible ? 'Aktívny' : 'Skrytý'}

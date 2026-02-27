@@ -20,7 +20,7 @@
 }
 
 .leftCol {
-    background: white;
+    background: var(--card-bg);
     padding: 2rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
@@ -34,7 +34,7 @@
 }
 
 .infoBox {
-    background: #f8fafc;
+    background: var(--bg-color);
     padding: 2rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
@@ -201,7 +201,7 @@
 }
 
 .statusProcessing {
-    background-color: #fffbeb;
+    background-color: var(--card-bg)beb;
     color: #d97706;
     border-color: #fef3c7;
 }

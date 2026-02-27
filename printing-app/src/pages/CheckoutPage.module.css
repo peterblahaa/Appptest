@@ -17,7 +17,7 @@
 }
 
 .formSection {
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
     padding: 2rem;
@@ -89,12 +89,12 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     cursor: pointer;
-    background: white;
+    background: var(--card-bg);
     transition: all 0.2s;
 }
 
 .radioLabel:hover {
-    background: #f8fafc;
+    background: var(--bg-color);
 }
 
 .radioLabel input[type="radio"]:checked+span {
@@ -104,7 +104,7 @@
 
 /* Summary Panel */
 .summaryPanel {
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
     padding: 1.5rem;

@@ -1,7 +1,7 @@
 /* HomePage.module.css */
 
 .heroSection {
-    background: radial-gradient(circle at top right, #e0f2fe 0%, #ffffff 40%, #f8fafc 100%);
+    background: radial-gradient(circle at top right, var(--primary-light) 0%, var(--card-bg) 40%, var(--bg-color) 100%);
     /* Sky light */
     padding: 6rem 1rem;
     text-align: center;
@@ -106,7 +106,7 @@
 }
 
 .stepCard {
-    background: white;
+    background: var(--card-bg);
     padding: 2.5rem 2rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
@@ -171,7 +171,7 @@
 .contactForm {
     max-width: 650px;
     margin: 0 auto;
-    background: white;
+    background: var(--card-bg);
     padding: 3rem;
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-color);
@@ -191,6 +191,8 @@
     min-height: 150px;
     font-family: inherit;
     transition: border-color 0.2s;
+    background-color: var(--card-bg);
+    color: var(--text-main);
 }
 
 .textarea:focus {

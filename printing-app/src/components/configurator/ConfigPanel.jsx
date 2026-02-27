@@ -15,7 +15,7 @@ export const ConfigPanel = ({ product, options, selectedOptions, onChange }) => 
                     value={product.name}
                     readOnly
                     className={styles.select}
-                    style={{ background: '#f8fafc', cursor: 'not-allowed' }}
+                    style={{ background: 'var(--bg-color)', cursor: 'not-allowed' }}
                 />
             </div>
 

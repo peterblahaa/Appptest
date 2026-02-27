@@ -255,18 +255,18 @@ export const AccountPage = () => {
                                 <h3>Moje objednávky</h3>
 
                                 {ordersLoading ? (
-                                    <p style={{ color: '#64748b', marginTop: '1rem' }}>Načítavam objednávky...</p>
+                                    <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Načítavam objednávky...</p>
                                 ) : ordersError ? (
                                     <div className={`${styles.notification} ${styles.error}`}>{ordersError}</div>
                                 ) : orders.length === 0 ? (
-                                    <p style={{ color: '#64748b', marginTop: '1rem' }}>Zatiaľ nemáte žiadne objednávky.</p>
+                                    <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Zatiaľ nemáte žiadne objednávky.</p>
                                 ) : (
                                     <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                         {orders.map(order => (
-                                            <div key={order.id} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem' }}>
+                                            <div key={order.id} style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '1rem' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                                                     <strong>Objednávka #{order.id}</strong>
-                                                    <span style={{ color: '#64748b' }}>{new Date(order.date).toLocaleDateString()}</span>
+                                                    <span style={{ color: 'var(--text-muted)' }}>{new Date(order.date).toLocaleDateString()}</span>
                                                 </div>
                                                 <div style={{ marginBottom: '0.5rem' }}>
                                                     <span className={`${styles.statusBadge} ${order.status === 'new' ? styles.statusNew :

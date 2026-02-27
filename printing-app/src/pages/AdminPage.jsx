@@ -711,7 +711,7 @@ export const AdminPage = () => {
                                             <td>{new Date(order.date).toLocaleString('sk-SK')}</td>
                                             <td>
                                                 <div style={{ fontWeight: 500 }}>{order.customer.name}</div>
-                                                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{order.customer.email}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{order.customer.email}</div>
                                             </td>
                                             <td style={{ fontWeight: 600 }}>{order.total.toFixed(2)} €</td>
                                             <td>
@@ -746,7 +746,7 @@ export const AdminPage = () => {
                                                     <select
                                                         className={styles.statusSelect}
                                                         style={{
-                                                            background: '#f8fafc',
+                                                            background: 'var(--bg-color)',
                                                             borderColor: '#e2e8f0',
                                                             color: '#475569',
                                                             minWidth: '160px',
@@ -795,14 +795,14 @@ export const AdminPage = () => {
                                                                     <div className={styles.itemMeta}>
                                                                         {Object.entries(item.selectedOptions || {}).map(([key, val]) => (
                                                                             <div key={key} style={{ marginRight: '20px', display: 'inline-flex', flexDirection: 'column', verticalAlign: 'top' }}>
-                                                                                <span style={{ fontWeight: 700, color: '#64748b', fontSize: '0.75rem', marginBottom: '2px', textTransform: 'uppercase' }}>{key}</span>
+                                                                                <span style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '2px', textTransform: 'uppercase' }}>{key}</span>
                                                                                 <span>{val}</span>
                                                                             </div>
                                                                         ))}
                                                                     </div>
                                                                 </div>
                                                                 <div style={{ textAlign: 'right', minWidth: '80px' }}>
-                                                                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary-color)' }}>{item.qty} <small style={{ fontSize: '0.7em', color: '#64748b' }}>ks</small></div>
+                                                                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary-color)' }}>{item.qty} <small style={{ fontSize: '0.7em', color: 'var(--text-muted)' }}>ks</small></div>
                                                                     <div style={{ fontWeight: 600 }}>{item.totalPriceVat?.toFixed(2)} €</div>
                                                                 </div>
                                                             </div>
@@ -874,7 +874,7 @@ export const AdminPage = () => {
                                                 </div>
                                             </td>
                                             <td style={{ fontWeight: 600 }}>{cat.name}</td>
-                                            <td style={{ fontFamily: 'monospace', color: '#64748b' }}>{cat.id}</td>
+                                            <td style={{ fontFamily: 'monospace', color: 'var(--text-muted)' }}>{cat.id}</td>
                                             <td>
                                                 <button
                                                     className={styles.actionBtn}
@@ -989,8 +989,8 @@ export const AdminPage = () => {
                                 return (
                                     <tr key={product.id}>
                                         <td style={{ fontWeight: 600 }}>{product.name}</td>
-                                        <td style={{ fontSize: '0.9rem', color: '#64748b' }}>{prodCat ? prodCat.name : product.categoryId}</td>
-                                        <td style={{ maxWidth: '300px', fontSize: '0.9rem', color: '#64748b' }}>{product.description}</td>
+                                        <td style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{prodCat ? prodCat.name : product.categoryId}</td>
+                                        <td style={{ maxWidth: '300px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{product.description}</td>
                                         <td>{Number(product.basePrice || 0).toFixed(2)} €</td>
                                         <td>
                                             <span className={product.isVisible ? styles.statusCompleted : styles.statusCancelled}>
@@ -1206,7 +1206,7 @@ export const AdminPage = () => {
                         <div className={styles.formGrid}>
                             <div className={styles.formGroup}>
                                 <label>Cenová úprava (%)</label>
-                                <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
                                     Zadajte percentuálnu zmenu ceny. <br />
                                     Napríklad <b>-20</b> pre 20% zľavu, <b>10</b> pre 10% navýšenie.
                                 </div>
@@ -1252,7 +1252,7 @@ export const AdminPage = () => {
                         <tbody>
                             {messages.map(msg => (
                                 <tr key={msg.id} style={{ opacity: msg.status === 'answered' ? 0.6 : 1 }}>
-                                    <td style={{ whiteSpace: 'nowrap', color: '#64748b' }}>
+                                    <td style={{ whiteSpace: 'nowrap', color: 'var(--text-muted)' }}>
                                         {new Date(msg.date).toLocaleString('sk-SK')}
                                     </td>
                                     <td style={{ fontWeight: 600 }}>{msg.name}</td>

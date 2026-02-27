@@ -28,7 +28,7 @@
     object-fit: cover;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
-    background: white;
+    background: var(--card-bg);
 }
 
 .filePrepLink {
@@ -50,7 +50,7 @@
 }
 
 .configSection {
-    background: white;
+    background: var(--card-bg);
     padding: 1.5rem;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
@@ -81,7 +81,7 @@
     padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    background-color: white;
+    background-color: var(--card-bg);
     font-size: 1rem;
     color: var(--text-main);
     transition: border-color 0.2s;
@@ -111,7 +111,7 @@
 .summarySidebar {
     position: sticky;
     top: 100px;
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
@@ -193,7 +193,7 @@
 
 .ctaSecondary {
     width: 100%;
-    background: white;
+    background: var(--card-bg);
     border: 2px solid var(--primary-color);
     color: var(--primary-color);
     padding: 0.75rem;

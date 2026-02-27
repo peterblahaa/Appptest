@@ -19,6 +19,7 @@ export function TestKalkulackaPage() {
         plate_price: 6,
     });
     const [apiMachines, setApiMachines] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
 
     React.useEffect(() => {
         const fetchMachines = async () => {
@@ -57,6 +58,15 @@ export function TestKalkulackaPage() {
         duplex: true,
         binding_type: 'V1',
         finishing: [], // array of strings
+        use_custom_machine: false,
+        custom_technology: 'digital',
+        custom_sheet_format: 'SRA3',
+        custom_digital_setup: 15,
+        custom_digital_price_1F: 0.03,
+        custom_digital_price_4F: 0.05,
+        custom_offset_setup: 30,
+        custom_offset_run_price: 0.02,
+        custom_plate_price: 6,
     });
 
     const [result, setResult] = useState(null);
@@ -93,7 +103,13 @@ export function TestKalkulackaPage() {
         }
 
         try {
-            await api.createMachine(parsedMachine);
+            if (isEditing) {
+                await api.updateMachine(parsedMachine.id, parsedMachine);
+                alert('Stroj bol úspešne upravený!');
+            } else {
+                await api.createMachine(parsedMachine);
+                alert('Stroj bol úspešne uložený do databázy!');
+            }
 
             // Update local state to reflect the newly created machine immediately
             const machineForState = { ...parsedMachine };
@@ -105,8 +121,18 @@ export function TestKalkulackaPage() {
             }));
 
             // reset basic fields on add machine
-            setNewMachine({ ...newMachine, name: '' });
-            alert('Stroj bol úspešne uložený do databázy!');
+            setNewMachine({
+                name: '',
+                technology: 'digital',
+                sheet_format: 'SRA3',
+                digital_setup_fixed: 15,
+                digital_price_per_side_1F: 0.03,
+                digital_price_per_side_4F: 0.05,
+                offset_run_price_per_sheet_side: 0.02,
+                offset_setup_per_side: 30,
+                plate_price: 6,
+            });
+            setIsEditing(false);
         } catch (err) {
             console.error("Chyba pri vytváraní stroja:", err);
             alert('Nepodarilo sa uložiť stroj do databázy. Skontrolujte pripojenie.');
@@ -119,18 +145,85 @@ export function TestKalkulackaPage() {
         }
     };
 
+    const handleEditMachineClick = (machineId, machineData) => {
+        setNewMachine({
+            name: machineId,
+            technology: machineData.technology || 'digital',
+            sheet_format: machineData.sheet_format || 'SRA3',
+            digital_setup_fixed: machineData.digital_setup_fixed ?? 15,
+            digital_price_per_side_1F: machineData.digital_price_per_side_1F ?? 0.03,
+            digital_price_per_side_4F: machineData.digital_price_per_side_4F ?? 0.05,
+            offset_run_price_per_sheet_side: machineData.offset_run_price_per_sheet_side ?? 0.02,
+            offset_setup_per_side: machineData.offset_setup_per_side ?? 30,
+            plate_price: machineData.plate_price ?? 6,
+        });
+        setIsEditing(true);
+    };
+
+    const handleDeleteMachine = async (machineId) => {
+        if (!window.confirm(`Naozaj chcete zmazať stroj ${machineId}?`)) return;
+        try {
+            await api.deleteMachine(machineId);
+            setApiMachines(prev => {
+                const next = { ...prev };
+                delete next[machineId];
+                return next;
+            });
+            if (newMachine.name === machineId) {
+                handleCancelEdit();
+            }
+            alert('Stroj bol úspešne zmazaný.');
+        } catch (err) {
+            console.error("Chyba pri mazaní stroja:", err);
+            alert('Nepodarilo sa zmazať stroj.');
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setNewMachine({
+            name: '',
+            technology: 'digital',
+            sheet_format: 'SRA3',
+            digital_setup_fixed: 15,
+            digital_price_per_side_1F: 0.03,
+            digital_price_per_side_4F: 0.05,
+            offset_run_price_per_sheet_side: 0.02,
+            offset_setup_per_side: 30,
+            plate_price: 6,
+        });
+        setIsEditing(false);
+    };
+
     const handleCalculate = () => {
         setError(null);
         setResult(null);
         try {
+            let activeMachineName = calcParams.machine_name;
+            const tempsMachines = { ...customMachines, ...apiMachines };
+
+            if (calcParams.use_custom_machine) {
+                activeMachineName = '__CUSTOM_USER__';
+                tempsMachines[activeMachineName] = {
+                    technology: calcParams.custom_technology,
+                    sheet_format: calcParams.custom_sheet_format,
+                    digital_setup_fixed: Number(calcParams.custom_digital_setup),
+                    digital_price_per_side_1F: Number(calcParams.custom_digital_price_1F),
+                    digital_price_per_side_4F: Number(calcParams.custom_digital_price_4F),
+                    offset_setup_per_side: Number(calcParams.custom_offset_setup),
+                    offset_run_price_per_sheet_side: Number(calcParams.custom_offset_run_price),
+                    plate_price: Number(calcParams.custom_plate_price),
+                };
+            }
+
             const res = calculate_print_price({
                 ...calcParams,
+                machine_name: activeMachineName,
                 quantity: Number(calcParams.quantity),
                 grammage_gm2: Number(calcParams.grammage_gm2),
                 pages: Number(calcParams.pages),
                 paper_price_per_ton: Number(paperPricePerTon),
                 paper_margin_percent: Number(paperMarginPercent),
-                custom_machines: { ...customMachines, ...apiMachines },
+                custom_machines: tempsMachines,
                 duplex: calcParams.duplex === true || calcParams.duplex === 'true',
             });
             setResult(res);
@@ -143,8 +236,14 @@ export function TestKalkulackaPage() {
         setCalcParams(prev => {
             const next = { ...prev, [key]: value };
             // auto update technology when machine changes
-            if (key === 'machine_name' && allMachines[value]) {
+            if (key === 'machine_name' && allMachines[value] && !next.use_custom_machine) {
                 next.technology = allMachines[value].technology;
+            }
+            if (key === 'custom_technology' && next.use_custom_machine) {
+                next.technology = value;
+            }
+            if (key === 'use_custom_machine') {
+                next.technology = value ? next.custom_technology : (allMachines[next.machine_name]?.technology || 'digital');
             }
             return next;
         });
@@ -165,12 +264,12 @@ export function TestKalkulackaPage() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Test Kalkulačky</h1>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+            <div className="grid grid-cols-2" style={{ gap: '2rem' }}>
 
                 {/* L'AVA STRANA - KONFIGURÁCIA A STROJE */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-                    <section style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: '#f9fafb' }}>
+                    <section style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '0.5rem', backgroundColor: 'var(--bg-color)' }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Globálne Parametre (Fixné)</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div>
@@ -194,8 +293,8 @@ export function TestKalkulackaPage() {
                         </div>
                     </section>
 
-                    <section style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: '#f9fafb' }}>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Pridať vlastný stroj</h2>
+                    <section style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '0.5rem', backgroundColor: 'var(--bg-color)' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>{isEditing ? 'Upraviť vlastný stroj' : 'Pridať vlastný stroj'}</h2>
                         <form onSubmit={handleAddMachine} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Názov Stroja (napr. MOJ_STROJ)</label>
@@ -204,10 +303,11 @@ export function TestKalkulackaPage() {
                                     type="text"
                                     value={newMachine.name}
                                     onChange={e => setNewMachine({ ...newMachine, name: e.target.value.toUpperCase().replace(/\s+/g, '_') })}
-                                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem', backgroundColor: isEditing ? '#f3f4f6' : 'white' }}
+                                    disabled={isEditing}
                                 />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Technológia</label>
                                     <select
@@ -233,13 +333,13 @@ export function TestKalkulackaPage() {
 
                             {newMachine.technology === 'digital' ? (
                                 <>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Setup (€)</label>
                                             <input type="number" step="0.01" value={newMachine.digital_setup_fixed} onChange={e => setNewMachine({ ...newMachine, digital_setup_fixed: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
                                         </div>
                                     </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cena 1F/strana (€)</label>
                                             <input type="number" step="0.001" value={newMachine.digital_price_per_side_1F} onChange={e => setNewMachine({ ...newMachine, digital_price_per_side_1F: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
@@ -252,7 +352,7 @@ export function TestKalkulackaPage() {
                                 </>
                             ) : (
                                 <>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Setup per side (€)</label>
                                             <input type="number" step="0.01" value={newMachine.offset_setup_per_side} onChange={e => setNewMachine({ ...newMachine, offset_setup_per_side: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
@@ -269,14 +369,38 @@ export function TestKalkulackaPage() {
                                 </>
                             )}
 
-                            <button type="submit" style={{ marginTop: '0.5rem', padding: '0.5rem 1rem', backgroundColor: '#3b82f6', color: 'white', borderRadius: '0.25rem', fontWeight: 'bold' }}>
-                                Pridať / Upraviť Stroj
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <button type="submit" style={{ flex: 1, padding: '0.5rem 1rem', backgroundColor: isEditing ? '#f59e0b' : '#3b82f6', color: 'white', borderRadius: '0.25rem', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+                                    {isEditing ? 'Upraviť Stroj' : 'Pridať Stroj'}
+                                </button>
+                                {isEditing && (
+                                    <button type="button" onClick={handleCancelEdit} style={{ flex: 1, padding: '0.5rem 1rem', backgroundColor: '#6b7280', color: 'white', borderRadius: '0.25rem', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+                                        Zrušiť
+                                    </button>
+                                )}
+                            </div>
                         </form>
+
+                        {Object.keys(apiMachines).length > 0 && (
+                            <div style={{ marginTop: '1.5rem' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Stroje v databáze:</h3>
+                                <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    {Object.keys(apiMachines).map(k => (
+                                        <li key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem', backgroundColor: 'var(--card-bg)' }}>
+                                            <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>{k} ({apiMachines[k].technology})</span>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button type="button" onClick={() => handleEditMachineClick(k, apiMachines[k])} style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: '#f59e0b', color: 'white', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}>Upraviť</button>
+                                                <button type="button" onClick={() => handleDeleteMachine(k)} style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: '#ef4444', color: 'white', borderRadius: '0.25rem', border: 'none', cursor: 'pointer' }}>Zmazať</button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
 
                         {Object.keys(customMachines).length > 0 && (
                             <div style={{ marginTop: '1.5rem' }}>
-                                <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Zoznam vlastných strojov:</h3>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Zoznam dočasných strojov (lokálne):</h3>
                                 <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', fontSize: '0.875rem' }}>
                                     {Object.keys(customMachines).map(k => (
                                         <li key={k}>{k} ({customMachines[k].technology})</li>
@@ -291,9 +415,9 @@ export function TestKalkulackaPage() {
                 {/* PRAVÁ STRANA - VSTUPY & VÝSLEDKY */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-                    <section style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: '#ffffff', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+                    <section style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '0.5rem', backgroundColor: 'var(--card-bg)', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Parametre Zákazky</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
 
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Typ Zákazky</label>
@@ -308,12 +432,76 @@ export function TestKalkulackaPage() {
                                 <input type="number" value={calcParams.quantity} onChange={e => updateCalcParam('quantity', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Stroj</label>
-                                <select value={calcParams.machine_name} onChange={e => updateCalcParam('machine_name', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}>
-                                    {machineOptions.map(m => <option key={m} value={m}>{m}</option>)}
-                                </select>
+                            <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <input
+                                    type="checkbox"
+                                    id="bypassMachine"
+                                    checked={calcParams.use_custom_machine}
+                                    onChange={e => updateCalcParam('use_custom_machine', e.target.checked)}
+                                />
+                                <label htmlFor="bypassMachine" style={{ fontWeight: '600', cursor: 'pointer', color: '#0ea5e9' }}>Zadať parametre stroja na mieru (obísť stroj)</label>
                             </div>
+
+                            {!calcParams.use_custom_machine ? (
+                                <div style={{ gridColumn: 'span 2' }}>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Stroj</label>
+                                    <select value={calcParams.machine_name} onChange={e => updateCalcParam('machine_name', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}>
+                                        {machineOptions.map(m => <option key={m} value={m}>{m}</option>)}
+                                    </select>
+                                </div>
+                            ) : (
+                                <div style={{ gridColumn: 'span 2', padding: '1rem', border: '1px dashed #0ea5e9', borderRadius: '0.5rem', backgroundColor: '#f0f9ff' }}>
+                                    <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', color: '#0ea5e9' }}>Vlastné parametre stroja</h3>
+                                    <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Technológia</label>
+                                            <select value={calcParams.custom_technology} onChange={e => updateCalcParam('custom_technology', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}>
+                                                <option value="digital">Digitál</option>
+                                                <option value="offset">Offset</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Formát Hárku</label>
+                                            <select value={calcParams.custom_sheet_format} onChange={e => updateCalcParam('custom_sheet_format', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}>
+                                                {formatOptions.map(f => <option key={f} value={f}>{f}</option>)}
+                                            </select>
+                                        </div>
+
+                                        {calcParams.custom_technology === 'digital' ? (
+                                            <>
+                                                <div>
+                                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Setup (€)</label>
+                                                    <input type="number" step="0.01" value={calcParams.custom_digital_setup} onChange={e => updateCalcParam('custom_digital_setup', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
+                                                </div>
+                                                <div></div>
+                                                <div>
+                                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cena 1F/strana (€)</label>
+                                                    <input type="number" step="0.001" value={calcParams.custom_digital_price_1F} onChange={e => updateCalcParam('custom_digital_price_1F', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cena 4F/strana (€)</label>
+                                                    <input type="number" step="0.001" value={calcParams.custom_digital_price_4F} onChange={e => updateCalcParam('custom_digital_price_4F', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Setup per side (€)</label>
+                                                    <input type="number" step="0.01" value={calcParams.custom_offset_setup} onChange={e => updateCalcParam('custom_offset_setup', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cena platne (€)</label>
+                                                    <input type="number" step="0.01" value={calcParams.custom_plate_price} onChange={e => updateCalcParam('custom_plate_price', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
+                                                </div>
+                                                <div style={{ gridColumn: 'span 2' }}>
+                                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Run price per sheet side (€)</label>
+                                                    <input type="number" step="0.001" value={calcParams.custom_offset_run_price} onChange={e => updateCalcParam('custom_offset_run_price', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }} />
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Formát Produktu</label>
@@ -395,7 +583,7 @@ export function TestKalkulackaPage() {
 
                     {/* VÝSLEDKY SECTION */}
                     {(result || error) && (
-                        <section style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', backgroundColor: error ? '#fef2f2' : '#ecfdf5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+                        <section style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '0.5rem', backgroundColor: error ? '#fef2f2' : '#ecfdf5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
                             <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: error ? '#dc2626' : '#059669' }}>
                                 {error ? 'Chyba Výpočtu' : 'Výsledok'}
                             </h2>

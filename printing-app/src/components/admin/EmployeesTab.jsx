@@ -137,7 +137,7 @@ export const EmployeesTab = () => {
                     {employees.map(emp => (
                         <tr key={emp.id}>
                             <td style={{ fontWeight: 600 }}>{emp.name}</td>
-                            <td style={{ color: '#64748b' }}>{emp.email}</td>
+                            <td style={{ color: 'var(--text-muted)' }}>{emp.email}</td>
                             <td>
                                 <span style={{
                                     padding: '0.25rem 0.75rem',

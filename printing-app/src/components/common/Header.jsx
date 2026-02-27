@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, User, Menu, X } from 'lucide-react';
+import { ShoppingCart, Search, User, Menu, X, Sun, Moon } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { categories, subCategories } from '../../data/mockData';
 import styles from './Header.module.css';
 
-import logo from '../../assets/hansman-logo.png';
+import logoLight from '../../assets/hansman-logo.png';
+import logoDark from '../../assets/hansman-logo-dark.png';
 
 export const Header = () => {
     const { cartCount } = useCart();
     const { user, isLoggedIn, stopImpersonating, isImpersonating } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Simple search logic
     useEffect(() => {
@@ -76,7 +80,7 @@ export const Header = () => {
                             navigate('/admin');
                         }}
                         style={{
-                            backgroundColor: 'white',
+                            backgroundColor: 'var(--card-bg)',
                             color: '#ef4444',
                             border: 'none',
                             padding: '0.2rem 0.8rem',
@@ -92,7 +96,7 @@ export const Header = () => {
             <header className={styles.header}>
                 <div className={`container ${styles.headerContainer}`}>
                     <Link to="/" className={styles.logo}>
-                        <img src={logo} alt="Hansman Tlačiareň" style={{ height: '100px' }} />
+                        <img src={theme === 'dark' ? logoDark : logoLight} alt="Hansman Tlačiareň" className={styles.logoImage} />
                     </Link>
 
                     <div className={styles.searchBar}>
@@ -131,23 +135,38 @@ export const Header = () => {
                         </form>
                     </div>
 
-                    <nav className={styles.nav}>
+                    <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`}>
                         {isLoggedIn && user?.isAdmin && (
-                            <Link to="/admin" className={styles.navLink} style={{ color: '#ef4444', fontWeight: 'bold' }}>Admin</Link>
+                            <Link to="/admin" className={styles.navLink} onClick={() => setIsMenuOpen(false)} style={{ color: '#ef4444', fontWeight: 'bold' }}>Admin</Link>
                         )}
-                        <Link to="/ponuka" className={styles.navLink}>Ponuka</Link>
-                        <Link to="/konto" className={styles.navItem}>
+                        <Link to="/ponuka" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Ponuka</Link>
+                        <Link to="/konto" className={styles.navItem} onClick={() => setIsMenuOpen(false)}>
                             <User size={24} color={isLoggedIn ? 'var(--primary-color)' : 'currentColor'} />
                             <span className={styles.navText}>
                                 {isLoggedIn ? (user?.name?.split(' ')[0] || 'Účet') : 'Konto'}
                             </span>
                         </Link>
-                        <Link to="/kosik" className={styles.cartBtn}>
+                        <Link to="/kosik" className={styles.cartBtn} onClick={() => setIsMenuOpen(false)}>
                             <ShoppingCart size={24} />
                             {cartCount > 0 && <span className={styles.badge}>{cartCount}</span>}
                             <span className={styles.cartText}>Košík</span>
                         </Link>
+                        <button
+                            onClick={toggleTheme}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', color: 'var(--text-main)' }}
+                            title="Prepnúť tmavý/svetlý režim"
+                        >
+                            {theme === 'dark' ? <Sun size={24} color="#f59e0b" /> : <Moon size={24} />}
+                        </button>
                     </nav>
+
+                    <button
+                        className={styles.hamburger}
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                    </button>
                 </div>
             </header>
         </>

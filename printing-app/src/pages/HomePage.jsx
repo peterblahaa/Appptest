@@ -99,7 +99,7 @@ export const HomePage = () => {
             </section>
 
             {/* 3. How it Works */}
-            <section className={styles.section} style={{ background: '#f8fafc' }}>
+            <section className={styles.section} style={{ background: 'var(--bg-color)' }}>
                 <div className="container">
                     <h2 className={styles.sectionTitle}>Ako to funguje?</h2>
                     <div className={styles.stepsGrid}>
@@ -153,7 +153,7 @@ export const HomePage = () => {
             </section>
 
             {/* 6. Contact Form */}
-            <section className={styles.section} style={{ background: '#f1f5f9' }}>
+            <section className={styles.section} style={{ background: 'var(--bg-color)' }}>
                 <div className="container">
                     <h2 className={styles.sectionTitle}>Máte otázky? Napíšte nám</h2>
                     <form className={styles.contactForm} onSubmit={handleContactSubmit}>

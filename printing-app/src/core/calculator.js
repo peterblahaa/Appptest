@@ -217,20 +217,15 @@ export function calculate_print_price(params = {}) {
             throw new Error("Počet strán musí byť deliteľný 4.");
         }
 
-        const a4_per_piece = pages / 4;
+        const ups = calculate_ups(final_sheet_format, product_format);
 
-        const [sheet_w, sheet_h] = FORMATS[final_sheet_format];
-        const [a4_w, a4_h] = FORMATS["A4"];
-
-        const fit1 = Math.floor(sheet_w / a4_w) * Math.floor(sheet_h / a4_h);
-        const fit2 = Math.floor(sheet_w / a4_h) * Math.floor(sheet_h / a4_w);
-        const a4_per_sheet = Math.max(fit1, fit2);
-
-        if (a4_per_sheet === 0) {
-            throw new Error("Na zvolený hárok sa nezmestí ani 1×A4.");
+        if (ups === 0) {
+            throw new Error(`Na zvolený hárok sa nezmestí ani 1×${product_format}.`);
         }
 
-        const sheets_per_piece = a4_per_piece / a4_per_sheet;
+        const pages_per_sheet = ups * (duplex ? 2 : 1);
+        const sheets_per_piece = pages / pages_per_sheet;
+
         sheets_needed = Math.ceil(sheets_per_piece * quantity);
         sides_total = duplex ? 2 : 1;
 

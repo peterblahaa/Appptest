@@ -52,7 +52,7 @@ export const ProductPage = () => {
                     </a>
 
                     {/* Upload Box Mock */}
-                    <div style={{ marginTop: '1rem', border: '2px dashed #cbd5e1', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: '#64748b' }}>
+                    <div style={{ marginTop: '1rem', border: '2px dashed #cbd5e1', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: 'var(--text-muted)' }}>
                         <p>Nahrajte súbory (PDF, AI, PSD)</p>
                         <small>max 100MB</small>
                     </div>

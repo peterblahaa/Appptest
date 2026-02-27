@@ -23,7 +23,7 @@ export const SummarySidebar = ({
                     </div>
                 </div>
 
-                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                     <strong>Podmienkou zásielky je:</strong>
                     <ul style={{ paddingLeft: '1.2rem', marginTop: '0.25rem' }}>
                         <li>pridanie súborov do 15:30</li>

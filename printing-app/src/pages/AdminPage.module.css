@@ -42,6 +42,13 @@
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0;
+    overflow-x: auto;
+    /* Allow horizontal scroll for tabs */
+    scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .tab {
@@ -56,11 +63,13 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
+    /* Prevent tabs from breaking into multiple lines on small screens */
 }
 
 .tab:hover {
     color: var(--primary-color);
-    background: #f8fafc;
+    background: var(--bg-color);
 }
 
 .activeTab {
@@ -83,7 +92,7 @@
 }
 
 .statCard {
-    background: white;
+    background: var(--card-bg);
     padding: 1.75rem;
     border-radius: var(--radius-xl);
     border: 1px solid rgba(226, 232, 240, 0.8);
@@ -156,7 +165,7 @@
 }
 
 .chartCard {
-    background: white;
+    background: var(--card-bg);
     padding: 1.75rem;
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-color);
@@ -177,9 +186,11 @@
 /* --- ORDERS CONTROLS --- */
 .controlsBar {
     display: flex;
+    flex-wrap: wrap;
+    /* Allow wrapping on mobile */
     gap: 1rem;
     margin-bottom: 1.5rem;
-    background: white;
+    background: var(--card-bg);
     padding: 1rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
@@ -196,12 +207,12 @@
     font-family: inherit;
     font-size: 0.95rem;
     transition: all 0.2s;
-    background-color: #f8fafc;
+    background-color: var(--bg-color);
 }
 
 .searchInput:focus {
     outline: none;
-    background-color: white;
+    background-color: var(--card-bg);
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--primary-light);
 }
@@ -213,23 +224,25 @@
     min-width: 180px;
     font-family: inherit;
     font-size: 0.95rem;
-    background-color: #f8fafc;
+    background-color: var(--bg-color);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .filterSelect:hover {
-    background-color: white;
+    background-color: var(--card-bg);
     border-color: var(--text-muted);
 }
 
 /* --- TABLE --- */
 .tableContainer {
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
     overflow: hidden;
+    overflow-x: auto;
+    /* Enable horizontal scrolling for the table container on mobile */
     /* For rounded corners */
 }
 
@@ -237,10 +250,12 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95rem;
+    min-width: 800px;
+    /* Force minimum width to trigger horizontal scroll when screen is too small */
 }
 
 .table thead {
-    background: #f8fafc;
+    background: var(--bg-color);
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -264,7 +279,7 @@
 }
 
 .table tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--bg-color);
 }
 
 .table td {
@@ -279,7 +294,7 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 1px solid var(--border-color);
-    background: #fff;
+    background: var(--card-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -295,7 +310,7 @@
 .noImg {
     width: 100%;
     height: 100%;
-    background: #f8fafc;
+    background: var(--bg-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -325,7 +340,7 @@
 }
 
 .statusProcessing {
-    background-color: #fffbeb;
+    background-color: var(--card-bg)beb;
     color: #d97706;
     border-color: #fef3c7;
 }
@@ -350,7 +365,7 @@
 
 /* Expanded Rows */
 .expandedRow {
-    background-color: #f8fafc;
+    background-color: var(--bg-color);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
@@ -365,7 +380,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -395,7 +410,7 @@
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--text-muted);
-    background: white;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
     transition: all 0.2s;
 }
@@ -423,7 +438,7 @@
 }
 
 .modalContent {
-    background: white;
+    background: var(--card-bg);
     width: 90%;
     max-width: 650px;
     border-radius: var(--radius-xl);

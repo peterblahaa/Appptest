@@ -146,7 +146,7 @@ export const CheckoutPage = () => {
                             <div key={item.cartId} className={styles.summaryItem}>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 600 }}>{item.name}</div>
-                                    <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{item.qty} ks</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.qty} ks</div>
                                 </div>
                                 <div style={{ fontWeight: 600 }}>
                                     {item.totalPriceVat.toFixed(2)} €
@@ -164,14 +164,14 @@ export const CheckoutPage = () => {
                             <span>Spolu k úhrade</span>
                             <span>{cartTotal.toFixed(2)} €</span>
                         </div>
-                        <div style={{ textAlign: 'right', fontSize: '0.8rem', color: '#64748b' }}>vrátane DPH</div>
+                        <div style={{ textAlign: 'right', fontSize: '0.8rem', color: 'var(--text-muted)' }}>vrátane DPH</div>
                     </div>
 
                     <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1.5rem', fontSize: '1.1rem' }}>
                         Objednať s povinnosťou platby
                     </button>
 
-                    <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#64748b', textAlign: 'center' }}>
+                    <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center' }}>
                         Odoslaním súhlasíte s obchodnými podmienkami.
                     </div>
                 </div>

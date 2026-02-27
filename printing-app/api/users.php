@@ -16,17 +16,69 @@ switch ($method) {
                 $user['priceModifier'] = (float)$user['priceModifier'];
                 echo json_encode($user);
             } else {
-                echo json_encode(null);
+                $stmt = $conn->prepare("SELECT * FROM employees WHERE id = ?");
+                $stmt->execute([$id]);
+                $emp = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($emp) {
+                    echo json_encode([
+                        'id' => $emp['id'],
+                        'email' => $emp['email'],
+                        'password' => $emp['password'],
+                        'name' => $emp['name'],
+                        'phone' => '',
+                        'newsletter' => false,
+                        'city' => '',
+                        'zip' => '',
+                        'company' => trim('Zamestnanec ' . $emp['department']),
+                        'isAdmin' => true,
+                        'priceModifier' => 0.0,
+                        'street' => '',
+                        'role' => $emp['role']
+                    ]);
+                } else {
+                    echo json_encode(null);
+                }
             }
         } else {
-            $email = isset($_GET['email']) ? $_GET['email'] : null;
-            $password = isset($_GET['password']) ? $_GET['password'] : null;
+            $raw_email = isset($_GET['email']) ? $_GET['email'] : null;
+            $raw_password = isset($_GET['password']) ? $_GET['password'] : null;
+            
+            $email = $raw_email ? trim($raw_email) : null;
+            $password = $raw_password ? trim($raw_password) : null;
 
             if ($email && $password) {
-                // Login
+                // Skusi login bezneho zakaznika
                 $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND password = ?");
                 $stmt->execute([$email, $password]);
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Ak nenajde BEZNEHO ZAKAZNIKA
+                if (count($users) === 0) {
+                    // Prehlada EXAKTNE tabulku employees pre zamestnanca
+                    $stmt = $conn->prepare("SELECT * FROM employees WHERE email = ? AND password = ?");
+                    $stmt->execute([$email, $password]);
+                    $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    if (count($employees) > 0) {
+                        $emp = $employees[0];
+                        $users = [[
+                            'id' => $emp['id'],
+                            'email' => $emp['email'],
+                            'password' => $emp['password'],
+                            'name' => $emp['name'],
+                            'phone' => '',
+                            'newsletter' => 0,
+                            'city' => '',
+                            'zip' => '',
+                            'company' => trim('Zamestnanec ' . $emp['department']),
+                            'isAdmin' => 1,
+                            'priceModifier' => 0,
+                            'street' => '',
+                            'role' => $emp['role']
+                        ]];
+                    }
+                }
             } else if ($email) {
                 // Check if exists
                 $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");

@@ -58,12 +58,25 @@ export const api = {
 
     // --- AUTH ---
     async login(email, password) {
-        const response = await fetch(`${API_URL}/users?email=${email}&password=${password}`);
-        const users = await response.json();
-        if (users.length > 0) {
-            return users[0];
+        console.log(`[DEBUG] Attempting login for ${email}`);
+        const url = `${API_URL}/users?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        console.log(`[DEBUG] Fetching from URL: ${url}`);
+
+        try {
+            const response = await fetch(url);
+            console.log(`[DEBUG] Response status:`, response.status);
+
+            const users = await response.json();
+            console.log(`[DEBUG] Received data from users.php:`, users);
+
+            if (users && users.length > 0) {
+                return users[0];
+            }
+            throw new Error('Nesprávny email alebo heslo.');
+        } catch (error) {
+            console.error(`[DEBUG] Login failed:`, error);
+            throw error;
         }
-        throw new Error('Nesprávny email alebo heslo.');
     },
 
     async register(userData) {

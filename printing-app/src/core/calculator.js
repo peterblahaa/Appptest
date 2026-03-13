@@ -20,10 +20,10 @@ export const FORMATS = {
 // 📚 VÄZBY
 // ============================================
 export const BINDINGS = {
-    V1: 10,
-    V2: 15,
-    V4: 20,
-    V8: 30
+    V1: { setup_cost: 10, price_per_piece: 0.05 },
+    V2: { setup_cost: 15, price_per_piece: 0.15 },
+    V4: { setup_cost: 20, price_per_piece: 0.50 },
+    V8: { setup_cost: 30, price_per_piece: 1.00 }
 };
 
 // ============================================
@@ -116,6 +116,7 @@ export function calculate_print_price(params = {}) {
         // custom parameters to inject dynamically created machines/finishing
         custom_machines = {},
         custom_finishing = {},
+        custom_bindings = {},
 
         // režim
         job_type = "sheet",                 // "sheet" alebo "catalog"
@@ -203,6 +204,7 @@ export function calculate_print_price(params = {}) {
     // ======================================
     let sheets_needed = 0;
     let sides_total = 0;
+    let forms_needed = 1;
 
     if (job_type === "sheet") {
         const ups = calculate_ups(final_sheet_format, product_format);
@@ -211,6 +213,7 @@ export function calculate_print_price(params = {}) {
         }
         sheets_needed = Math.ceil(quantity / ups);
         sides_total = duplex ? 2 : 1;
+        forms_needed = 1;
 
     } else if (job_type === "catalog") {
         if (pages % 4 !== 0) {
@@ -228,6 +231,7 @@ export function calculate_print_price(params = {}) {
 
         sheets_needed = Math.ceil(sheets_per_piece * quantity);
         sides_total = duplex ? 2 : 1;
+        forms_needed = Math.ceil(sheets_per_piece);
 
     } else {
         throw new Error("job_type musí byť 'sheet' alebo 'catalog'.");
@@ -254,7 +258,7 @@ export function calculate_print_price(params = {}) {
     if (final_technology === "digital") {
         // digitál: tlač per-side už zahŕňa farebnosť (1F/4F)
         print_cost = sheets_needed * sides_total * final_digital_price_per_side;
-        setup_cost = final_digital_setup_fixed;
+        setup_cost = final_digital_setup_fixed * forms_needed;
 
     } else {
         // offset: print per-side, platne podľa offset_color_mode
@@ -263,27 +267,30 @@ export function calculate_print_price(params = {}) {
         }
 
         const colors = OFFSET_COLOR_MODES[offset_color_mode];
-        const total_plates = colors.front + colors.back;
+        const total_plates = (colors.front + colors.back) * forms_needed;
 
         print_cost = sheets_needed * sides_total * final_offset_run_price_per_sheet_side;
 
-        // setup: môžeš si vybrať:
-        // A) fix za prípravu na stranu (tvoj starý model)
-        // setup_cost = final_offset_setup_per_side * sides_total
-        //
-        // B) platne podľa farieb (realistickejšie)
-        setup_cost = final_plate_price * total_plates;
+        // setup: sčítame pevnú prípravu stroja + cenu za platne
+        const prep_cost = final_offset_setup_per_side * sides_total * forms_needed;
+        const plates_cost = final_plate_price * total_plates;
+
+        setup_cost = prep_cost + plates_cost;
     }
 
     // ======================================
     // 4️⃣ VÄZBA
     // ======================================
     let binding_cost = 0;
+    const ALL_BINDINGS = { ...BINDINGS, ...custom_bindings };
     if (job_type === "catalog") {
-        if (BINDINGS[binding_type] === undefined) {
+        if (ALL_BINDINGS[binding_type] === undefined) {
             throw new Error(`Neznáma väzba: ${binding_type}`);
         }
-        binding_cost = BINDINGS[binding_type] + quantity * binding_pass_price;
+        const b = ALL_BINDINGS[binding_type];
+        const b_setup = typeof b === 'object' ? b.setup_cost : b;
+        const b_pass = typeof b === 'object' ? b.price_per_piece : binding_pass_price;
+        binding_cost = b_setup + quantity * b_pass;
     }
 
     // ======================================

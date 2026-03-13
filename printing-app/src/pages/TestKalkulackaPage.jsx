@@ -7,6 +7,10 @@ export function TestKalkulackaPage() {
     const [paperPricePerTon, setPaperPricePerTon] = useState(1100);
     const [paperMarginPercent, setPaperMarginPercent] = useState(0);
     const [customMachines, setCustomMachines] = useState({});
+
+    // Custom prices for bindings and finishing
+    const [customBindings, setCustomBindings] = useState(JSON.parse(JSON.stringify(BINDINGS)));
+    const [customFinishing, setCustomFinishing] = useState(JSON.parse(JSON.stringify(DEFAULT_FINISHING)));
     const [newMachine, setNewMachine] = useState({
         name: '',
         technology: 'digital',
@@ -20,10 +24,12 @@ export function TestKalkulackaPage() {
     });
     const [apiMachines, setApiMachines] = useState({});
     const [isEditing, setIsEditing] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     React.useEffect(() => {
         const fetchMachines = async () => {
             try {
+                // Načítanie strojov
                 const machinesList = await api.getMachines();
                 const machinesObj = {};
                 for (const m of machinesList) {
@@ -32,12 +38,25 @@ export function TestKalkulackaPage() {
                 }
                 setApiMachines(machinesObj);
 
-                // Set default selected if applicable
                 if (machinesList.length > 0) {
                     setCalcParams(prev => ({ ...prev, machine_name: machinesList[0].id }));
                 }
+
+                // Načítanie globálnych nastavení
+                try {
+                    const settings = await api.getSettings();
+                    if (settings) {
+                        if (settings.custom_bindings) setCustomBindings(settings.custom_bindings);
+                        if (settings.custom_finishing) setCustomFinishing(settings.custom_finishing);
+                    }
+                } catch (e) {
+                    console.error("Neviem načítať settings:", e);
+                }
+
+                // Označiť za načítané pre auto-save
+                setIsLoaded(true);
             } catch (err) {
-                console.error("Nebolo možné načítať stroje z databázy:", err);
+                console.error("Nebolo možné načítať dáta z databázy:", err);
             }
         };
         fetchMachines();
@@ -194,6 +213,24 @@ export function TestKalkulackaPage() {
         setIsEditing(false);
     };
 
+    // Auto-Ukladanie väzby
+    React.useEffect(() => {
+        if (!isLoaded) return;
+        const timer = setTimeout(() => {
+            api.updateSettings({ custom_bindings: customBindings }).catch(console.error);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [customBindings, isLoaded]);
+
+    // Auto-Ukladanie dokončovania
+    React.useEffect(() => {
+        if (!isLoaded) return;
+        const timer = setTimeout(() => {
+            api.updateSettings({ custom_finishing: customFinishing }).catch(console.error);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [customFinishing, isLoaded]);
+
     const handleCalculate = () => {
         setError(null);
         setResult(null);
@@ -224,6 +261,8 @@ export function TestKalkulackaPage() {
                 paper_price_per_ton: Number(paperPricePerTon),
                 paper_margin_percent: Number(paperMarginPercent),
                 custom_machines: tempsMachines,
+                custom_bindings: customBindings,
+                custom_finishing: customFinishing,
                 duplex: calcParams.duplex === true || calcParams.duplex === 'true',
             });
             setResult(res);
@@ -290,6 +329,68 @@ export function TestKalkulackaPage() {
                                     style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
                                 />
                             </div>
+                        </div>
+                    </section>
+
+                    <section style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '0.5rem', backgroundColor: 'var(--bg-color)' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Ceny Väzby</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {Object.keys(customBindings).map(b => (
+                                <div key={b} className="grid grid-cols-3" style={{ gap: '1rem', alignItems: 'end' }}>
+                                    <div style={{ fontWeight: 'bold', paddingBottom: '0.5rem' }}>{b}</div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.25rem' }}>Setup (€)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={customBindings[b].setup_cost}
+                                            onChange={e => setCustomBindings(prev => ({ ...prev, [b]: { ...prev[b], setup_cost: Number(e.target.value) } }))}
+                                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cena/kus (€)</label>
+                                        <input
+                                            type="number"
+                                            step="0.001"
+                                            value={customBindings[b].price_per_piece}
+                                            onChange={e => setCustomBindings(prev => ({ ...prev, [b]: { ...prev[b], price_per_piece: Number(e.target.value) } }))}
+                                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '0.5rem', backgroundColor: 'var(--bg-color)' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Ceny Dokončovania</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {Object.keys(customFinishing).map(f => (
+                                <div key={f} className="grid grid-cols-3" style={{ gap: '1rem', alignItems: 'end' }}>
+                                    <div style={{ fontWeight: 'bold', paddingBottom: '0.5rem' }}>{f}</div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.25rem' }}>Setup (€)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={customFinishing[f].setup_cost}
+                                            onChange={e => setCustomFinishing(prev => ({ ...prev, [f]: { ...prev[f], setup_cost: Number(e.target.value) } }))}
+                                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cena/hárok (€)</label>
+                                        <input
+                                            type="number"
+                                            step="0.001"
+                                            value={customFinishing[f].price_per_sheet_pass}
+                                            onChange={e => setCustomFinishing(prev => ({ ...prev, [f]: { ...prev[f], price_per_sheet_pass: Number(e.target.value) } }))}
+                                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </section>
 

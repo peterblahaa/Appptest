@@ -241,5 +241,21 @@ export const api = {
         });
         if (!response.ok) throw new Error('Odstránenie stroja zlyhalo.');
         return true;
+    },
+
+    // --- SETTINGS (Väzby, Dokončovanie, atď) ---
+    async getSettings() {
+        const response = await fetch(`${API_URL}/settings.php`);
+        return await response.json();
+    },
+
+    async updateSettings(data) {
+        const response = await fetch(`${API_URL}/settings.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Ukladanie nastavení zlyhalo.');
+        return await response.json();
     }
 };

@@ -96,7 +96,11 @@ export const Header = () => {
             <header className={styles.header}>
                 <div className={`container ${styles.headerContainer}`}>
                     <Link to="/" className={styles.logo}>
-                        <img src={theme === 'dark' ? logoDark : logoLight} alt="Hansman Tlačiareň" className={styles.logoImage} />
+                        <img
+                            src={theme === 'dark' ? logoDark : logoLight}
+                            alt="Hansman Tlačiareň"
+                            className={theme === 'dark' ? styles.logoImageDark : styles.logoImage}
+                        />
                     </Link>
 
                     <div className={styles.searchBar}>
@@ -151,13 +155,6 @@ export const Header = () => {
                             {cartCount > 0 && <span className={styles.badge}>{cartCount}</span>}
                             <span className={styles.cartText}>Košík</span>
                         </Link>
-                        <button
-                            onClick={toggleTheme}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', color: 'var(--text-main)' }}
-                            title="Prepnúť tmavý/svetlý režim"
-                        >
-                            {theme === 'dark' ? <Sun size={24} color="#f59e0b" /> : <Moon size={24} />}
-                        </button>
                     </nav>
 
                     <button

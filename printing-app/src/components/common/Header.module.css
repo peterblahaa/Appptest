@@ -40,6 +40,14 @@
     transition: height 0.3s ease;
 }
 
+.logoImageDark {
+    height: 60px;
+    width: 310px;
+    object-fit: cover;
+    object-position: center;
+    transition: height 0.3s ease;
+}
+
 .searchBar {
     flex: 1;
     max-width: 600px;
@@ -206,6 +214,11 @@
 
     .logoImage {
         height: 40px;
+    }
+
+    .logoImageDark {
+        height: 40px;
+        width: 206px;
     }
 
     .searchBar {

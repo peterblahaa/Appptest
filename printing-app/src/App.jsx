@@ -16,6 +16,7 @@ import { AccountPage } from './pages/AccountPage';
 import { AdminPage } from './pages/AdminPage';
 
 import { TestKalkulackaPage } from './pages/TestKalkulackaPage';
+import { GalleryPage } from './pages/GalleryPage';
 
 import { Footer } from './components/common/Footer';
 
@@ -35,6 +36,7 @@ function App() {
                   <Route path="/konto" element={<AccountPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/ponuka/:category" element={<SubCategoryPage />} />
+                  <Route path="/galeria" element={<GalleryPage />} />
                   <Route path="/produkt/:id" element={<ProductPage />} />
                   <Route path="/kosik" element={<CartPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />

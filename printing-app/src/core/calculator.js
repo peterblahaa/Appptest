@@ -195,6 +195,7 @@ export function calculate_print_price(params = {}) {
 
         } else { // offset
             final_offset_run_price_per_sheet_side = m.offset_run_price_per_sheet_side !== undefined ? m.offset_run_price_per_sheet_side : final_offset_run_price_per_sheet_side;
+            final_offset_setup_per_side = m.offset_setup_per_side !== undefined ? m.offset_setup_per_side : final_offset_setup_per_side;
             final_plate_price = m.plate_price !== undefined ? m.plate_price : final_plate_price;
         }
     }
@@ -258,7 +259,8 @@ export function calculate_print_price(params = {}) {
     if (final_technology === "digital") {
         // digitál: tlač per-side už zahŕňa farebnosť (1F/4F)
         print_cost = sheets_needed * sides_total * final_digital_price_per_side;
-        setup_cost = final_digital_setup_fixed * forms_needed;
+        // Pre digitál je setup iba raz za celú zákazku
+        setup_cost = Number(final_digital_setup_fixed);
 
     } else {
         // offset: print per-side, platne podľa offset_color_mode

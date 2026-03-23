@@ -144,6 +144,7 @@ export const Header = () => {
                             <Link to="/admin" className={styles.navLink} onClick={() => setIsMenuOpen(false)} style={{ color: '#ef4444', fontWeight: 'bold' }}>Admin</Link>
                         )}
                         <Link to="/ponuka" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Ponuka</Link>
+                        <Link to="/galeria" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Galéria</Link>
                         <Link to="/konto" className={styles.navItem} onClick={() => setIsMenuOpen(false)}>
                             <User size={24} color={isLoggedIn ? 'var(--primary-color)' : 'currentColor'} />
                             <span className={styles.navText}>
